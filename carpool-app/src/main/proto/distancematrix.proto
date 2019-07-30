@@ -1,0 +1,24 @@
+syntax = "proto2";
+
+package distancematrix;
+
+option java_package = "org.jonglaria.distancematrix";
+option java_outer_classname = "DistanceMatrix";
+
+message Location {
+required string accountname = 1;
+required string displayname = 2;
+required double lattitude = 3;
+required double longitude = 4;
+required uint32 offered_places = 5;
+}
+
+message Locations {
+repeated Location locations = 1;
+}
+
+
+message Matrix {
+repeated double distance_matrix = 1 [packed=true];
+repeated int64 time_matrix = 2 [packed=true];
+}

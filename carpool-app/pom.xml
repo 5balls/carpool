@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.jonglaria.app</groupId>
+  <artifactId>carpool-app</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  
+
+  <name>carpool-app</name>
+  <url>https://www.jonglaria.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+    <!-- protobuf paths -->
+    <protobuf.input.directory>${project.basedir}/src/main/proto</protobuf.input.directory>
+    <protobuf.output.directory>${project.build.directory}/generated-sources/protobuf/java</protobuf.output.directory>
+    <!-- library versions -->
+  <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
+    <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
+    <maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
+    <maven-shade-plugin.version>2.4.2</maven-shade-plugin.version>
+    <os-maven-plugin.version>1.4.1.Final</os-maven-plugin.version>
+    <protobuf.version>3.8.0</protobuf.version>
+<slf4jVersion>1.6.1</slf4jVersion>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.graphhopper</groupId>
+      <artifactId>graphhopper-reader-osm</artifactId>
+      <version>0.12-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+<dependency>
+    <groupId>com.google.protobuf</groupId>
+    <artifactId>protobuf-java</artifactId>
+    <version>${protobuf.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+    <version>${slf4jVersion}</version>
+</dependency>
+<dependency>
+<groupId>org.slf4j</groupId>
+<artifactId>slf4j-nop</artifactId>
+<version>${slf4jVersion}</version>
+</dependency>
+  </dependencies>
+
+    <repositories>
+        <repository>
+            <id>sonatype-oss-public</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+  <build>
+ <resources>
+        <resource>
+	  <directory>${project.build.directory}/generated-sources/protobuf/java</directory>
+        </resource>
+      </resources>
+<extensions>
+        <!-- provides os.detected.classifier (i.e. linux-x86_64, osx-x86_64) property -->
+        <extension>
+            <groupId>kr.motd.maven</groupId>
+            <artifactId>os-maven-plugin</artifactId>
+            <version>${os-maven-plugin.version}</version>
+        </extension>
+    </extensions>
+<!--    <pluginManagement> --><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+      <plugins>
+        <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+        <!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.0.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.8.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.1</version>
+        </plugin>
+<!-- add generated proto buffer classes into the package -->
+<plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>build-helper-maven-plugin</artifactId>
+    <version>${build-helper-maven-plugin.version}</version>
+    <executions>
+        <execution>
+            <id>add-extra-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+                <goal>add-source</goal>
+            </goals>
+            <configuration>
+                <sources>
+                    <source>target/generated-sources/protobuf/java</source>
+                    <source>src/main/java</source>
+                </sources>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+<plugin>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <version>0.6.1</version>
+        <configuration>
+          <protocExecutable>/usr/bin/protoc</protocExecutable>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>test-compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+                <archive>
+                <manifest>
+                    <mainClass>
+                        org.jonglaria.app.App
+                    </mainClass>
+                </manifest>
+                </archive>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+            </configuration>
+</plugin>
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-jar-plugin</artifactId>
+<version>3.1.2</version>
+    <configuration>
+        <archive>
+            <manifest>
+                <addClasspath>true</addClasspath>
+                <classpathPrefix>libs/</classpathPrefix>
+                <mainClass>
+                    org.jonglaria.app.App
+                </mainClass>
+            </manifest>
+        </archive>
+    </configuration>
+</plugin>
+        <plugin>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.5.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.2</version>
+        </plugin>
+        <!-- site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.7.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>3.0.0</version>
+        </plugin>
+	<plugin>
+	  <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>copy-dependencies</id>
+              <phase>prepare-package</phase>
+              <goals>
+                <goal>copy-dependencies</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>
+                    ${project.build.directory}/libs
+                </outputDirectory>
+              </configuration>
+            </execution>
+        <execution>
+            <id>copy-protoc</id>
+            <phase>generate-sources</phase>
+            <goals>
+                <goal>copy</goal>
+            </goals>
+            <configuration>
+                <artifactItems>
+                    <artifactItem>
+                        <groupId>com.google.protobuf</groupId>
+                        <artifactId>protoc</artifactId>
+                        <version>${protobuf.version}</version>
+                        <classifier>${os.detected.classifier}</classifier>
+                        <type>exe</type>
+                        <overWrite>true</overWrite>
+                        <outputDirectory>${project.build.directory}</outputDirectory>
+                    </artifactItem>
+                </artifactItems>
+            </configuration>
+        </execution>
+
+          </executions>
+	</plugin>
+      </plugins>
+    <!-- </pluginManagement> -->
+  </build>
+</project>
